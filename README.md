@@ -5,8 +5,11 @@ A simple JavaScript library for Bitcoin SV (BSV)
 - enable peer to peer transactions ✅
 - browser friendly ✅
 - Typescript and JavaScript autocomplete ✅
-- HD Private Keys at 0 technical cost ✅
 - ❤️ easy to use ❤️
+
+missing feature:
+
+- Stas token (under dev)
 
 ## How to install
 
@@ -55,7 +58,7 @@ const wallet = new Wallet(); // just pass nothing
 const privateKey = wallet.getPrivateKey();
 ```
 
-## Get your balance
+#### Get your balance
 
 ```js
 const balanceInSatoshis = await wallet.getBalance();
@@ -63,7 +66,7 @@ const balanceInSatoshis = await wallet.getBalance();
 console.log({ balanceInSatoshis });
 ```
 
-## Get your address
+#### Get your address
 
 ```js
 const myAddress = wallet.getAddress();
@@ -71,7 +74,7 @@ const myAddress = wallet.getAddress();
 console.log({ myAddress });
 ```
 
-## Sign a tx for your friend
+#### Sign a tx for your friend
 
 ```js
 const friendAdr = "oKobVjH2dqa9U...";
@@ -82,7 +85,7 @@ const txHex = await wallet.signTx({
 });
 ```
 
-## Broadcast it to the blockchain
+#### Broadcast it to the blockchain
 
 ```js
 const txHex = "...";
