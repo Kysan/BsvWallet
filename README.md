@@ -33,9 +33,7 @@ const { Wallet } = require("bsv-wallet");
 
 ## How to use
 
-### Create or Import a wallet
-
-#### Import with a mnemonic
+#### Import a wallet
 
 ```js
 const myMnemonic = "awkward will execute giant ...";
@@ -55,7 +53,7 @@ const walet = new Wallet({ key: seed, keyFormat: "string" });
 
 ```js
 const wallet = new Wallet(); // just pass nothing
-const privateKey = wallet.getPrivateKey();
+const privateKey = wallet.getPrivateKey(); // ->  "awkward will angle wide ... canoe demise execute"
 ```
 
 #### Get your balance
