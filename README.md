@@ -115,5 +115,5 @@ walletBob.broadcast(txForAlice) // return the tx id
 
 ## Dev note
 
-If you wish to contribute or encounter any issue
-You can contact me on discord @Kysan#8315
+If you wish to contribute or encounter any issue  
+You can contact me on discord @Kysan#8315 or by email at pro.kysan@protonmail.com
