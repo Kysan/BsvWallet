@@ -7,9 +7,9 @@ A simple JavaScript library for Bitcoin SV (BSV)
 - Typescript and JavaScript autocomplete ✅
 - ❤️ easy to use ❤️
 
-missing feature:
+Next feature:
 
-- Stas token (under dev)
+- Stas token handling
 
 ## How to install
 
@@ -115,5 +115,5 @@ walletBob.broadcast(txForAlice) // return the tx id
 
 ## Dev note
 
-If you wish to contribute or encounter any issue  
-You can contact me on discord @Kysan#8315 or by email at pro.kysan@protonmail.com
+If you wish to contribute or encounter any issu :  
+you can contact me on discord `@Kysan#8315` or by email at `pro.kysan@protonmail.com`
