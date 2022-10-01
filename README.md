@@ -117,7 +117,5 @@ walletBob.broadcast(txForAlice) // return the tx id
 
 ## Dev note
 
-There i no other documentation at this time but the autocomplete will mostly tell you how to use the lib
-
 If you wish to contribute or encounter any issue
 You can contact me on discord @Kysan#8315
