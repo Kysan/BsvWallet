@@ -38,7 +38,7 @@ class HDWallet extends HDPrivateKeyManager {
   }
 
   getAddress(): string {
-    return super.getAddress(0);
+    return super.getAddress(0).toString();
   }
 
   /**

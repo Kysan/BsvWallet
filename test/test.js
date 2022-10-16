@@ -1,5 +1,6 @@
-const { Wallet } = require("../lib");
-const { adrToAdrHash } = require("../lib/Utils/Crypto");
+const { Wallet } = require("../lib")
+
+
 
 
 
@@ -7,9 +8,24 @@ const [wallet, walletClarence, walletAntho] = [
   "awkward will execute giant dwarf few diagram era elite wage decade fame",
   "cloth reward eagle alert bamboo opinion stool wreck priority kangaroo task century",
   "mule innocent angle wide version canoe demise volcano visual enact duty brother"
-].map(key => new Wallet({ key, network: "testnet" }))
+]
+  .map(key => new Wallet({ key, network: "testnet" }))
 
 
+
+
+const test = async () => {
+
+  const adr = wallet.getAddress();
+
+  console.log({ adr })
+
+}
+
+test()
+
+
+/*
 
 const test = async () => {
   const [adrAntho] = walletAntho.getAddresses(0, 3);
@@ -63,3 +79,8 @@ const test = async () => {
 }
 
 test()
+
+
+
+
+*/

@@ -25,7 +25,7 @@ declare class HDPrivateKeyManager {
     protected getDerivatedPublicKey(index: number): string;
     protected getDerivatedPrivateKey(index: number): string;
     protected getDerivatedAddress(index: number): string;
-    getMnemonic(language?: MnemonicLanguage): string;
+    getPrivateKey(language?: MnemonicLanguage): string;
     /**
      * give out a range of adresses
      */

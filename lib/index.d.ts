@@ -1,4 +1,4 @@
-import BIP32HDWallet from "./HDWallet";
+import BIP32HDWallet from "./BIP32HDWallet";
 import Wallet from "./Wallet";
 import HDPrivateKey from "./HDPrivateKey";
 import Blockchain from "./Blockchain";

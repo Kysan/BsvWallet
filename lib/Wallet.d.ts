@@ -37,6 +37,5 @@ declare class HDWallet extends HDPrivateKeyManager {
     broadcast(txHex: string): Promise<string>;
     getBalance(): Promise<number>;
     createTokenContractTx(schema: StasTokenSchema, supply: number): Promise<string>;
-    getPrivateKey(): string;
 }
 export default HDWallet;

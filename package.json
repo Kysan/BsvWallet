@@ -1,6 +1,6 @@
 {
   "name": "bsv-wallet",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "description": "A Bitcoin SV Wallet Library",
   "keywords": [
     "javascript",
@@ -30,12 +30,15 @@
     }
   },
   "scripts": {
-    "dev:notworking": "parcel watch src/index.ts",
+    "bundle": "npx parcel build src/index.ts --dist-dir ./lib",
+    "dev:notworking": "npx parcel watch src/index.ts",
     "dev": "tsc --watch",
     "test:notworking": "concurrently \"parcel watch test/index.ts --dist-dir test/dist\" \"nodemon test/dist/index.js\"",
     "test": "node test/test.js",
-    "build": "tsc",
-    "build:browser": "npx parcel lib/index.js --dist-dir lib/browser"
+    "build:node": "tsc",
+    "build:browser": "npx parcel lib/index.js --dist-dir lib/browser",
+    "build": "npm run build:node && npm run build:browser",
+    "build:final": "rm -rf ./lib/*.js && mv ./lib/browser/* ./lib"
   },
   "repository": {
     "type": "git",
