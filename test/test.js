@@ -1,8 +1,6 @@
 const { Wallet } = require("../lib")
 
 
-
-
 /*
 const [wallet, walletClarence, walletAntho] = [
   "awkward will execute giant dwarf few diagram era elite wage decade fame",
@@ -10,6 +8,9 @@ const [wallet, walletClarence, walletAntho] = [
   "mule innocent angle wide version canoe demise volcano visual enact duty brother"
 ]
 .map(key => new Wallet({ key, network: "testnet" }))*/
+
+
+const z = new Wallet()
 
 const wallet = new Wallet({
   key: "awkward will execute giant dwarf few diagram era elite wage decade fame",
