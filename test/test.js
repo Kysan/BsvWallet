@@ -10,7 +10,6 @@ const [wallet, walletClarence, walletAntho] = [
 .map(key => new Wallet({ key, network: "testnet" }))*/
 
 
-const z = new Wallet()
 
 const wallet = new Wallet({
   key: "awkward will execute giant dwarf few diagram era elite wage decade fame",
@@ -23,12 +22,19 @@ const test = async () => {
 
 
 
-  console.log({ balance: await wallet.getBalance(), address: wallet.getAddress() })
+  // console.log({ balance: await wallet.getBalance(), address: wallet.getAddress() })
+  const history = await wallet.getHistory()
+  history.map(tx => console.log(tx))
 
-
-  // const txhex = wallet.signTx({
-  //   to: ""
+  // const txHex = await wallet.signTx({
+  //   to: "mmjhRyUUobFcFsfD9mchrTKXn6kMmR5aox",
+  //   amount: 10000
   // })
+
+  // console.log({ txHex })
+  // // const txhex = wallet.signTx({
+  // //   to: ""
+  // // })
 
 }
 

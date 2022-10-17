@@ -35,12 +35,25 @@ class Blockchain {
 
     this.api = axios.create({
       baseURL: `https://api.whatsonchain.com/v1/bsv/${networkName}`,
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1",
+      },
     });
+
+    // this.api.interceptors.request.use(async (req) => {
+    //   return await new Promise((res) => setTimeout(() => res(req), 500));
+    // });
 
     // this.api.interceptors.request.use((req) => {
     //   console.log(`${req.method.toUpperCase()} ${req.baseURL}${req.url}`);
     //   console.log(req.data);
     //   return req;
+    // });
+
+    // this.api.interceptors.response.use((res) => {
+    //   console.log(res.data);
+    //   return res;
     // });
   }
 
@@ -155,6 +168,42 @@ class Blockchain {
     const { data } = await this.api.get(`/address/${address}/history`);
 
     return data;
+  }
+
+  async getBulkTxDetails(txHash: string[]) {
+    try {
+      var { data } = await this.api.post("/txs", {
+        txids: txHash,
+      });
+    } catch (error) {
+      console.log("What'sOnChain RPC error");
+      // console.log({ error });
+      process.exit();
+    }
+
+    type TxDetail = {
+      hash: string;
+      inputs: { hash: string; index: number }[];
+      outputs: { index: number; to: string; satoshis: number }[];
+      time: number;
+    };
+    const x: TxDetail[] = data
+      .map(({ hash, vin, vout, time }) => ({ hash, vin, vout, time }))
+      .map((tx) => ({
+        hash: tx.hash,
+        inputs: tx.vin.map((input) => ({
+          hash: input.txid,
+          index: input.vout,
+        })),
+        outputs: tx.vout.map((output) => ({
+          index: output.n,
+          to: (output?.scriptPubKey?.addresses || ["unknow"])[0],
+          satoshis: output.value || -1,
+        })),
+        time: tx.time,
+      }));
+
+    return x;
   }
 }
 

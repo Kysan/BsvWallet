@@ -18,7 +18,7 @@ export declare type UTXO = {
 declare class HDWallet extends HDPrivateKeyManager {
     blockchain: Blockchain;
     constructor(params: WalletConstructorParams | undefined);
-    getAddress(): string;
+    getAddress(): Promise<string>;
     /**
      * @param maxIndex this function with download the history of each derivated address from 0 to this
      * @returns
@@ -37,5 +37,20 @@ declare class HDWallet extends HDPrivateKeyManager {
     broadcast(txHex: string): Promise<string>;
     getBalance(): Promise<number>;
     createTokenContractTx(schema: StasTokenSchema, supply: number): Promise<string>;
+    getHistory(): Promise<{
+        inputs: {
+            index: number;
+            to: string;
+            satoshis: number;
+            hash: any;
+        }[];
+        hash: string;
+        outputs: {
+            index: number;
+            to: string;
+            satoshis: number;
+        }[];
+        time: number;
+    }[]>;
 }
 export default HDWallet;

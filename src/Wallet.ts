@@ -37,7 +37,7 @@ class HDWallet extends HDPrivateKeyManager {
     this.blockchain = new Blockchain(network);
   }
 
-  getAddress(): string {
+  async getAddress(): Promise<string> {
     return super.getAddress(0).toString();
   }
 
@@ -46,7 +46,9 @@ class HDWallet extends HDPrivateKeyManager {
    * @returns
    */
   public async getUtxo(): Promise<UTXO[]> {
-    const utxo = await this.blockchain.getUnspendTxOuput(this.getAddress());
+    const address = await this.getAddress();
+
+    const utxo = await this.blockchain.getUnspendTxOuput(address);
 
     const allUTXO = utxo.map((utxo) => {
       const ownerAddress = this.getDerivatedAddress(0);
@@ -56,7 +58,7 @@ class HDWallet extends HDPrivateKeyManager {
         satoshis: utxo.value,
         outputIndex: utxo.tx_pos,
         script: bsv.Script(new Address(ownerAddress)),
-        ownerAddress: this.getAddress(),
+        ownerAddress: address,
       };
       return improvedData;
     });
@@ -161,6 +163,43 @@ class HDWallet extends HDPrivateKeyManager {
 
     // * et enfin on retourne la transaction à broadcast
     return tx.toString();
+  }
+
+  public async getHistory() {
+    const walletAddress = await this.getAddress();
+    const txs = await this.blockchain.getHistory(walletAddress);
+    const hash = txs.map((tx) => tx.tx_hash);
+    const txsDetails = await this.blockchain.getBulkTxDetails(hash);
+
+    // txsDetails.forEach((a) => console.log(JSON.stringify(a, null, 4)));
+    const inputsHash = txsDetails.flatMap((tx) =>
+      tx.inputs.map((input) => input.hash)
+    );
+
+    const inputTxDetails = await this.blockchain.getBulkTxDetails(inputsHash);
+
+    const findInputDetail = ({ index, hash }) => {
+      // * on retrouve la tx correspondante
+      const tx = inputTxDetails.find((tx) => tx.hash == hash);
+
+      // * si on en a trouvé une on charge les détails des outputs à l'index donnée de l'input
+      if (tx) {
+        var details = tx.outputs[index];
+      }
+
+      return {
+        index: 0,
+        to: "error",
+        satoshis: -1,
+        hash,
+        ...details,
+      };
+    };
+
+    return txsDetails.map((tx) => ({
+      ...tx,
+      inputs: tx.inputs.map((input) => findInputDetail(input)),
+    }));
   }
 }
 

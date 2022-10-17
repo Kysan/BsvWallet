@@ -35,5 +35,18 @@ declare class Blockchain {
     getRawTx(txhash: any): Promise<string>;
     getTxDetails(txHash: any): Promise<TxDetails>;
     getHistory(address: string): Promise<AccountTxHistory>;
+    getBulkTxDetails(txHash: string[]): Promise<{
+        hash: string;
+        inputs: {
+            hash: string;
+            index: number;
+        }[];
+        outputs: {
+            index: number;
+            to: string;
+            satoshis: number;
+        }[];
+        time: number;
+    }[]>;
 }
 export default Blockchain;
