@@ -11,7 +11,10 @@ const [wallet, walletClarence, walletAntho] = [
 ]
 .map(key => new Wallet({ key, network: "testnet" }))*/
 
-const wallet = new Wallet({ key: "question height hawk equip fall veteran club surge have client list reform" })
+const wallet = new Wallet({
+  key: "awkward will execute giant dwarf few diagram era elite wage decade fame",
+  network: "testnet"
+})
 
 
 

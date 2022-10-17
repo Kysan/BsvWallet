@@ -46,17 +46,17 @@ class HDWallet extends HDPrivateKeyManager {
    * @returns
    */
   public async getUtxo(): Promise<UTXO[]> {
-    const utxo = await this.blockchain.getBulkUTXO([this.getAddress()]);
+    const utxo = await this.blockchain.getUnspendTxOuput(this.getAddress());
 
     const allUTXO = utxo.map((utxo) => {
-      const ownerAddress = this.getDerivatedAddress(utxo.privateKeyIndex);
+      const ownerAddress = this.getDerivatedAddress(0);
       const improvedData = {
-        privKeyIndex: utxo.privateKeyIndex,
+        privKeyIndex: 0,
         txId: utxo.tx_hash,
         satoshis: utxo.value,
         outputIndex: utxo.tx_pos,
         script: bsv.Script(new Address(ownerAddress)),
-        ownerAddress: utxo.ownerAddress,
+        ownerAddress: this.getAddress(),
       };
       return improvedData;
     });

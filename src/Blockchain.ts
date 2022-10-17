@@ -16,6 +16,7 @@ type WhatsOnChainBsvNetwork = "main" | "test";
 const translateNetworkNameFromBSVJSToWoC = (
   network: BsvNetwork
 ): WhatsOnChainBsvNetwork => {
+  // *
   switch (network) {
     case "livenet":
       return "main";
