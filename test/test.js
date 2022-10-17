@@ -3,22 +3,28 @@ const { Wallet } = require("../lib")
 
 
 
-
+/*
 const [wallet, walletClarence, walletAntho] = [
   "awkward will execute giant dwarf few diagram era elite wage decade fame",
   "cloth reward eagle alert bamboo opinion stool wreck priority kangaroo task century",
   "mule innocent angle wide version canoe demise volcano visual enact duty brother"
 ]
-  .map(key => new Wallet({ key, network: "testnet" }))
+.map(key => new Wallet({ key, network: "testnet" }))*/
 
+const wallet = new Wallet({ key: "question height hawk equip fall veteran club surge have client list reform" })
 
 
 
 const test = async () => {
 
-  const adr = wallet.getAddress();
 
-  console.log({ adr })
+
+  console.log({ balance: await wallet.getBalance(), address: wallet.getAddress() })
+
+
+  // const txhex = wallet.signTx({
+  //   to: ""
+  // })
 
 }
 
