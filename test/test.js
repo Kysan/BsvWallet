@@ -20,12 +20,24 @@ const wallet = new Wallet({
 
 const test = async () => {
 
+  // const wallet = new Wallet()
+  // const key = wallet.getPrivateKey()
+  const wallet = new Wallet({ key: "awkward will execute giant dwarf few diagram era elite wage decade fame" })
+
+  const address = await wallet.getAddress()
+  const balance = await wallet.getBalance()
+
+  const txId = await wallet.sendMoney({
+    to: "azelrkaezrmkj",
+    amount: 1234
+  })
+
+
+
 
 
   // console.log({ balance: await wallet.getBalance(), address: wallet.getAddress() })
-  const history = await wallet.getHistory()
-  history.map(tx => console.log(tx))
-
+  console.log(await wallet.getHistory())
   // const txHex = await wallet.signTx({
   //   to: "mmjhRyUUobFcFsfD9mchrTKXn6kMmR5aox",
   //   amount: 10000

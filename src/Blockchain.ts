@@ -198,7 +198,7 @@ class Blockchain {
         outputs: tx.vout.map((output) => ({
           index: output.n,
           to: (output?.scriptPubKey?.addresses || ["unknow"])[0],
-          satoshis: output.value || -1,
+          satoshis: Math.round(output.value * 10 ** 8) / 10 ** 8 || 0,
         })),
         time: tx.time,
       }));

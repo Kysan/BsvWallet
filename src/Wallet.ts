@@ -5,12 +5,13 @@ import Blockchain from "./Blockchain";
 
 import { adrToAdrHash, getTxId } from "./Utils/Crypto";
 import StasTokenSchema from "./Utils/Types/StasTokenSchema";
+import MnemonicLanguage from "./Utils/MnemonicLanguages";
 
 export type OutputRequest = {
-  type: "normal" | "op return";
+  type?: "normal" | "op return";
   to: string; // address
   amount: number;
-  opReturnData: string;
+  opReturnData?: string;
 };
 
 export type UTXO = {
@@ -25,7 +26,7 @@ export type UTXO = {
 class HDWallet extends HDPrivateKeyManager {
   public blockchain: Blockchain;
 
-  constructor(params: WalletConstructorParams | undefined) {
+  constructor(params?: WalletConstructorParams) {
     const {
       key = "",
       keyFormat = "mnemonic",
@@ -57,13 +58,18 @@ class HDWallet extends HDPrivateKeyManager {
         txId: utxo.tx_hash,
         satoshis: utxo.value,
         outputIndex: utxo.tx_pos,
-        script: bsv.Script(new Address(ownerAddress)),
+        script: bsv.Script(new Address(address)),
         ownerAddress: address,
       };
       return improvedData;
     });
 
     return allUTXO;
+  }
+
+  public async sendMoney(output: OutputRequest | OutputRequest[]) {
+    const txHex = await this.signTx(output);
+    return await this.broadcast(txHex);
   }
 
   public async signTx(output: OutputRequest | OutputRequest[]) {
@@ -83,7 +89,7 @@ class HDWallet extends HDPrivateKeyManager {
     }
 
     // * ou oublie pas l'addresse de change
-    const myAdr = this.getAddress();
+    const myAdr = await this.getAddress();
     tx.change(myAdr);
 
     // * on récupères la clef privée qui correspond à chaque utxo
@@ -127,7 +133,7 @@ class HDWallet extends HDPrivateKeyManager {
     schema: StasTokenSchema,
     supply: number
   ): Promise<string> {
-    const adr = this.getAddress();
+    const adr = await this.getAddress();
     const publicKeyHash = adrToAdrHash(adr);
 
     // * on crée notre script avec le schema du token
@@ -190,7 +196,7 @@ class HDWallet extends HDPrivateKeyManager {
       return {
         index: 0,
         to: "error",
-        satoshis: -1,
+        satoshis: 0,
         hash,
         ...details,
       };

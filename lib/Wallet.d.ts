@@ -2,10 +2,10 @@ import HDPrivateKeyManager, { WalletConstructorParams } from "./HDPrivateKey";
 import Blockchain from "./Blockchain";
 import StasTokenSchema from "./Utils/Types/StasTokenSchema";
 export declare type OutputRequest = {
-    type: "normal" | "op return";
+    type?: "normal" | "op return";
     to: string;
     amount: number;
-    opReturnData: string;
+    opReturnData?: string;
 };
 export declare type UTXO = {
     privKeyIndex: number;
@@ -17,13 +17,14 @@ export declare type UTXO = {
 };
 declare class HDWallet extends HDPrivateKeyManager {
     blockchain: Blockchain;
-    constructor(params: WalletConstructorParams | undefined);
+    constructor(params?: WalletConstructorParams);
     getAddress(): Promise<string>;
     /**
      * @param maxIndex this function with download the history of each derivated address from 0 to this
      * @returns
      */
     getUtxo(): Promise<UTXO[]>;
+    sendMoney(output: OutputRequest | OutputRequest[]): Promise<string>;
     signTx(output: OutputRequest | OutputRequest[]): Promise<any>;
     /**
      * broadcast the transaction

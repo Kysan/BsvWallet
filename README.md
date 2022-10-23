@@ -9,19 +9,21 @@ A simple JavaScript library for Bitcoin SV (BSV)
 
 Current features:
 
-- create a wallet (new private key)
-- import a wallets (from a private key)
-- get wallet address
-- sign a transactions (send money)
-- send/broadcast a transactions
-- get wallet balance
-- get wallet tx history
+- create your wallet (new private key)
+- import your wallet (from a private key)
+- get your wallet address
+- sign a transactions
+- broadcast a transactions
+- send money (sign & then broadcast your tx)
+- get your wallet balance
+- get your wallet tx history
 - read blockchain data
 
 Next features:
 
-- Hierarchical Deterministic (HD) Wallet at 0 technical cost
 - Stas token (easy NFT minting)
+- Hierarchical Deterministic (HD) Wallet at 0 technical cost
+- More stable RPC than Whatsonchain
 
 ## How to install
 
@@ -48,24 +50,14 @@ const { Wallet } = require("bsv-wallet");
 #### Import a wallet
 
 ```js
-const myMnemonic = "awkward will execute giant ...";
-
-const wallet = new Wallet({ key: myMnemonic });
-```
-
-#### Import with a seed string
-
-```js
-const seed = "Kwn6yDoKobVjH2dqa9UZ4c5yXfUQQo6PxdQ...";
-
-const walet = new Wallet({ key: seed, keyFormat: "string" });
+const wallet = new Wallet({ key: "awkward will execute giant ..." });
 ```
 
 #### Create a new Wallet and get the mnemonic
 
 ```js
 const wallet = new Wallet(); // just pass nothing
-const privateKey = wallet.getPrivateKey(); // ->  "awkward will angle wide ... canoe demise execute"
+const key = wallet.getPrivateKey(); // ->  "awkward will angle wide ... canoe demise execute"
 ```
 
 #### Get your balance
@@ -107,25 +99,16 @@ const txId = await wallet.broadcast(txHex);
 ## Exemple: Bob sending money to Alice
 
 ```js
-// * we import two wallets
 const walletBob = new Wallet(key: "bob private key");
-const walletAlice = new Wallet(key: "alice private key");
 
-
-// * sign a tx for Alice with the bob wallet
-const txForAlice = await walletBob.signTx({
-  to: walletAlice.getAddress(),
+const transactionId = await walletBob.sendMoney({
+  to: "alice address",
   amount: 1234
 });
 
-// right now the tx is signed but not in the bsv blockchain
-// (like a signed check but not delivered to the bank)
-// to do so you will have to broadcast it
-
-walletBob.broadcast(txForAlice) // return the tx id
 ```
 
 ## Dev note
 
-If you wish to contribute or encounter any issu :  
-you can contact me on discord `@Kysan#8315` or by email at `pro.kysan@protonmail.com`
+If you wish to contribute or encounter any issues
+please contact me on discord `@Kysan#8315` or by email at `pro.kysan@protonmail.com`
