@@ -1,21 +1,22 @@
 import bsv from "bsv";
-import { getTxId } from "./Utils/Crypto";
+import { adrToAdrHash, getTxId } from "./Utils/Crypto";
 import {
   extractAddressFromPayToPublicKeyScript,
   getTxUnspendOutput,
 } from "./Utils/Tx";
 
-interface Input {
+export interface TxInput {
   prevTxId: string;
   prevTxOutputIndex: number;
   script: string;
   sequenceNumber: number;
 }
 
-interface Output {
+export interface TxOutput {
   satoshis: number;
   script: string;
   index: number;
+  targetAdrHash: string;
 }
 
 class ReadOnlyTx {
@@ -25,7 +26,7 @@ class ReadOnlyTx {
     this.txHex = txHex;
   }
 
-  getInputs(): Input[] {
+  getInputs(): TxInput[] {
     const tx = bsv.Transaction(this.txHex);
 
     return tx.inputs.map((input) => ({
@@ -37,13 +38,16 @@ class ReadOnlyTx {
     }));
   }
 
-  getOutputs(): Output[] {
+  getOutputs(): TxOutput[] {
     const tx = bsv.Transaction(this.txHex);
 
     return tx.outputs.map((output, i) => ({
       script: new bsv.Script(output._scriptBuffer).toASM(),
       satoshis: output._satoshis,
       index: i,
+      targetAdrHash: extractAddressFromPayToPublicKeyScript(
+        new bsv.Script(output._scriptBuffer).toASM()
+      ),
     }));
   }
 

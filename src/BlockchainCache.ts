@@ -1,5 +1,5 @@
 import { BsvNetwork } from "./HDPrivateKey";
-import { getTxId } from "./Utils/Crypto";
+import { adrToAdrHash, getTxId } from "./Utils/Crypto";
 import { splitInGroupOf } from "./Utils/GroupBy";
 import AddressBalance from "./Utils/HTTPResponse/AddressBalance";
 import { TxDetails } from "./Utils/HTTPResponse/TxDetails";
@@ -51,26 +51,27 @@ const read = (filePath: string): UTXO[] => {
 };
 
 class BlockchainCache {
-  private userFirstAdr: BitcoinAddress;
-
+  private userAddress: BitcoinAddress;
+  private walletIndex: number;
   private wallet: P2PWallet;
   get spendOuputs(): UTXO[] {
-    return read(this.userFirstAdr + ".spend.tx");
+    return read(this.userAddress + ".spend.tx");
   }
 
   get unspendOuputs(): UTXO[] {
-    return read(this.userFirstAdr + ".unspend.tx");
+    return read(this.userAddress + ".unspend.tx");
   }
 
   set spendOuputs(utxos) {
-    write(this.userFirstAdr + ".spend.tx", utxos);
+    write(this.userAddress + ".spend.tx", utxos);
   }
   set unspendOuputs(utxos) {
-    write(this.userFirstAdr + ".unspend.tx", utxos);
+    write(this.userAddress + ".unspend.tx", utxos);
   }
-  constructor(instancerWallet: P2PWallet, userFirstAdr: string) {
+  constructor(instancerWallet: P2PWallet, walletIndex: number = 0) {
     this.wallet = instancerWallet;
-    this.userFirstAdr = userFirstAdr;
+    this.userAddress = this.wallet.getAddress(walletIndex);
+    this.walletIndex = walletIndex;
   }
 
   loadAllUnspendTx(rawTxs: string[]) {
@@ -84,7 +85,7 @@ class BlockchainCache {
   async getBalance(address: string): Promise<number> {
     let totalSatoshis = 0;
 
-    const utxoOfThisAdr = this.getUnspendTxOuputOf(address);
+    const utxoOfThisAdr = this.getUnspendTxOutput();
 
     utxoOfThisAdr.forEach((utxo) => {
       totalSatoshis += utxo.satoshis;
@@ -103,62 +104,68 @@ class BlockchainCache {
     return totalSatoshis;
   }
 
-  // * return the tx id
-  broadcast = (txHex: string): string => {
-    const tx = new ReadOnlyTx(txHex);
-
-    const outputs = tx.getOutputs();
-
+  private static removeUsedUtxo(utxo: UTXO[], tx: ReadOnlyTx) {
     const inputs = tx.getInputs();
 
-    let unspendOuputs = [...this.unspendOuputs];
-    let spendOuputs = [...this.spendOuputs];
+    const txoIsInInputs = (utxo: UTXO) =>
+      inputs.find((input) => utxo.matchTxInput(input));
 
-    console.log({ unspendOuputs, spendOuputs });
+    return {
+      unspend: utxo.filter((utxo) => !txoIsInInputs(utxo)),
+      spend: utxo.filter((utxo) => txoIsInInputs(utxo)),
+    };
+  }
 
-    // * on vire les inputs de cette tx du caches car ils sont utilisés
-    for (let input of inputs) {
-      const newSpendOutputs = [];
+  // * return the tx id
+  broadcast = (txHex: string, start?: number, end?: number): string => {
+    const tx = new ReadOnlyTx(txHex);
 
-      for (let unspendOuput of unspendOuputs) {
-        if (
-          unspendOuput.txId == input.prevTxId &&
-          unspendOuput.ouputIndex == input.prevTxOutputIndex
-        ) {
-          newSpendOutputs.push(unspendOuput);
-        }
+    let unspendOutputs = this.unspendOuputs;
+    const spendOutputs = this.spendOuputs;
+
+    for (const output of tx.getOutputs()) {
+      if (adrToAdrHash(this.userAddress) == output.targetAdrHash) {
+        const { spend, unspend } = BlockchainCache.removeUsedUtxo(
+          [
+            ...unspendOutputs,
+            new UTXO(txHex, output.index, this.walletIndex, this.userAddress),
+          ],
+          tx
+        );
+        unspendOutputs = unspend;
+        spendOutputs.push(...spend);
+      } else {
+        // pas pour cet utilisateur on ignore
       }
-
-      const isInNewSpendOutPut = (txo: UTXO) => {
-        return newSpendOutputs.find((ntxo) => ntxo.equal(txo)) && true;
-      };
-
-      // * on les enlèves des unspend
-      unspendOuputs = this.unspendOuputs.filter(
-        (txo) => !isInNewSpendOutPut(txo)
-      );
-      // * et on les passes à spend
-      spendOuputs.push(...newSpendOutputs);
     }
 
-    // * et on ajoutes les nouveaux outputs
-    for (let output of outputs) {
-      const utxo = new UTXO(txHex, output.index);
-      // const withoutduplicate = this.unspendOuputs.filter(
-      //   (o) => o.ouputIndex != utxo.ouputIndex && o.txId != utxo.txId
-      // );
-      // process.exit();
-      unspendOuputs.push(utxo);
-    }
+    this.unspendOuputs = unspendOutputs;
+    this.spendOuputs = spendOutputs;
 
-    this.unspendOuputs = unspendOuputs;
-    this.spendOuputs = spendOuputs;
+    if (start !== undefined && end) {
+      const addresses = this.wallet.getAddresses(start, end);
+      const caches = addresses.forEach((adr, i) => {
+        const cache = new BlockchainCache(this.wallet, start + i);
+        cache.broadcast(txHex);
+      });
+    }
 
     return getTxId(txHex);
   };
 
-  getUnspendTxOuputOf(address: string): UTXO[] {
-    return this.unspendOuputs.filter((utxo) => utxo.isOwnedBy(address));
+  getUnspendTxOutput(): UTXO[] {
+    return this.unspendOuputs.filter((utxo) =>
+      utxo.isOwnedBy(this.userAddress)
+    );
+  }
+
+  getBulkUtxo(startIndex: number, endIndex: number) {
+    const addresses = this.wallet.getAddresses(startIndex, endIndex);
+    const caches = addresses.map(
+      (adr, i) => new BlockchainCache(this.wallet, startIndex + i)
+    );
+
+    return caches.flatMap((c) => c.getUnspendTxOutput());
   }
 }
 

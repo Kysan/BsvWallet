@@ -32,11 +32,11 @@ const test = async () => {
 
   const showAllBalance = async () => {
     console.log({
-      myAdr: await myWallet.getAddress(),
-      aliceAdr: await alice.getAddress(),
-      mine: await myWallet.getBalance(),
-      alice: await alice.getBalance(),
-      bob: await bob.getBalance(),
+      myAdr: myWallet.getAddress(),
+      aliceAdr: alice.getAddress(),
+      mine: myWallet.getBalance(),
+      alice: alice.getBalance(),
+      bob: bob.getBalance(),
     });
   };
 
@@ -51,21 +51,17 @@ const test = async () => {
   //   myUtxo: myWallet.cache.unspendOuputs,
   //   aliceUtxo: alice.cache.unspendOuputs,
   // });
-  const tx1 = await myWallet.signTx({
-    to: await alice.getAddress(),
-    amount: 1000,
-  });
-  const tx2 = await myWallet.signTx({
-    to: await alice.getAddress(),
-    amount: 1000,
+
+  console.log({
+    aliceAdrs: [alice.getNewAddress(), alice.getNewAddress()],
   });
 
-  await alice.receive(tx1);
-  await alice.receive(tx2);
-  // console.log({
-  //   myUtxo: myWallet.cache.unspendOuputs,
-  //   aliceUtxo: alice.cache.unspendOuputs,
+  // const tx1 = await myWallet.signTx({
+  //   to: alice.getNewAddress(),
+  //   amount: 500,
   // });
+
+  // await alice.receive(tx1);
 
   await showAllBalance();
 

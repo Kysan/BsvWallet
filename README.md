@@ -18,8 +18,9 @@ Current features:
 - get your wallet balance
 - get your wallet tx history
 - read blockchain data
+- work offline (P2PWallet)
 
-Next features:
+  Next features:
 
 - Stas token (easy NFT minting)
 - Hierarchical Deterministic (HD) Wallet at 0 technical cost

@@ -5,12 +5,14 @@ import HDPrivateKeyManager, {
   WalletConstructorParams,
 } from "./HDPrivateKey";
 import bsv from "bsv";
+
 import Address from "bsv/lib/address";
 import { UTXO } from "./Wallet";
 import { Wallet } from ".";
 
 class P2PWallet extends HDPrivateKeyManager {
   public cache: BlockchainCache;
+  public lastUsedIndex: number = 0;
   constructor(params?: WalletConstructorParams) {
     const {
       key = "",
@@ -20,7 +22,7 @@ class P2PWallet extends HDPrivateKeyManager {
       ...options
     } = params || {};
     super({ key, keyFormat, language, network, ...options });
-    this.cache = new BlockchainCache(this, super.getAddress(0).toString());
+    this.cache = new BlockchainCache(this);
   }
 
   async downloadUTXO() {
@@ -42,19 +44,33 @@ class P2PWallet extends HDPrivateKeyManager {
     return this.cache.loadAllUnspendTx(rawTxsToCache);
   }
 
-  async getAddress(): Promise<string> {
-    return super.getAddress(0).toString();
+  public getAddress(n: number = 0) {
+    return super.getAddress(n).toString();
   }
 
-  public async getUtxo(): Promise<UTXO[]> {
-    const address = await this.getAddress();
+  public getNewAddress() {
+    this.lastUsedIndex++;
+    return this.getAddress(this.lastUsedIndex);
+  }
 
-    const utxo = this.cache.getUnspendTxOuputOf(address);
+  public getBalance(): number {
+    let totalSatoshis = 0;
+    const utxo = this.getUtxo();
+    // console.log({ utxo: utxo.map((o) => o.toBsvJsUtxoFormat()) });
+    utxo.forEach((utxo) => (totalSatoshis += utxo.satoshis));
+
+    return totalSatoshis;
+  }
+
+  public getUtxo(): UTXO[] {
+    const address = this.getAddress();
+
+    const utxo = this.cache.getBulkUtxo(0, 10);
 
     const allUTXO = utxo.map((utxo) => {
       const ownerAddress = this.getDerivatedAddress(0);
       const improvedData = {
-        ...utxo.toBsvJsUtxoFormat(0, ownerAddress),
+        ...utxo.toBsvJsUtxoFormat(),
         script: bsv.Script(new Address(address)), // au cas ou ça marche pas : utxo.script
         ownerAddress: address,
       };
@@ -64,7 +80,7 @@ class P2PWallet extends HDPrivateKeyManager {
     return allUTXO;
   }
 
-  public async signTx(
+  public signTx(
     output: OutputRequest | OutputRequest[],
     autoUpdate: boolean = true
   ) {
@@ -72,12 +88,12 @@ class P2PWallet extends HDPrivateKeyManager {
     const tx = new bsv.Transaction();
 
     // * on charge les inputs
-    const utxo = await this.getUtxo();
+    const utxo = this.getUtxo();
 
     tx.from(utxo);
 
     // * on charge les ouputs
-    const balance = await this.getBalance();
+    const balance = this.getBalance();
 
     const txFees = 200;
     if (Array.isArray(output)) {
@@ -96,7 +112,7 @@ class P2PWallet extends HDPrivateKeyManager {
     }
 
     // * ou oublie pas l'addresse de change
-    const myAdr = await this.getAddress();
+    const myAdr = this.getAddress();
     tx.change(myAdr);
 
     // * on récupères la clef privée qui correspond à chaque utxo
@@ -116,15 +132,8 @@ class P2PWallet extends HDPrivateKeyManager {
     return txHex;
   }
 
-  public async getBalance() {
-    const totalSat = await this.cache.getBalance(await this.getAddress());
-
-    // TODO: return confirmed et unconfirmed seperatly
-    return totalSat;
-  }
-
-  public async receive(txHex: string): Promise<string> {
-    return this.cache.broadcast(txHex);
+  public receive(txHex: string): string {
+    return this.cache.broadcast(txHex, 0, 10);
   }
 }
 

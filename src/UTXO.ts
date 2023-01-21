@@ -1,5 +1,5 @@
 import { getTxId } from "./Utils/Crypto";
-import ReadOnlyTx from "./ReadOnlyTx";
+import ReadOnlyTx, { TxInput } from "./ReadOnlyTx";
 import { extractAddressFromPayToPublicKeyScript } from "./Utils/Tx";
 import { adrToAdrHash } from "./Utils/Crypto";
 type BsvJsUtxoFormat = {
@@ -16,11 +16,19 @@ type BsvJsUtxoFormat = {
  */
 class UTXO {
   private transaction: ReadOnlyTx;
-  private index: number;
-
-  constructor(txHex: string, index: number) {
+  private outputIndex: number;
+  private walletIndex: number;
+  private ownerAddress: string;
+  constructor(
+    txHex: string,
+    outputIndex: number,
+    walletIndex: number,
+    ownerAdr: string
+  ) {
     this.transaction = new ReadOnlyTx(txHex);
-    this.index = index;
+    this.outputIndex = outputIndex;
+    this.walletIndex = walletIndex;
+    this.ownerAddress = ownerAdr;
   }
 
   get txId() {
@@ -28,38 +36,40 @@ class UTXO {
   }
 
   get ouputIndex() {
-    return this.index;
+    return this.outputIndex;
   }
 
   get satoshis() {
-    return this.transaction.getOutputs()[this.index].satoshis;
+    return this.transaction.getOutputs()[this.outputIndex].satoshis;
   }
   serialize() {
     return JSON.stringify({
       id: this.txId,
       tx: this.transaction.toString(),
-      index: this.index,
+      outputIndex: this.outputIndex,
+      walletIndex: this.walletIndex,
+      ownerAddress: this.ownerAddress,
     });
   }
 
   static deserialize(s: string): UTXO {
-    const { tx, index } = JSON.parse(s);
-    return new UTXO(tx, index);
+    const { tx, walletIndex, outputIndex, ownerAddress } = JSON.parse(s);
+    return new UTXO(tx, outputIndex, walletIndex, ownerAddress);
   }
 
-  toBsvJsUtxoFormat(pkIdx: number, ownerAddress: string): BsvJsUtxoFormat {
+  toBsvJsUtxoFormat(): BsvJsUtxoFormat {
     return {
-      privKeyIndex: pkIdx,
+      privKeyIndex: this.walletIndex,
       txId: this.transaction.getHash(),
-      satoshis: this.transaction.getOutputs()[this.index].satoshis,
-      outputIndex: this.index,
-      script: this.transaction.getOutputs()[this.index].script,
-      ownerAddress: ownerAddress,
+      satoshis: this.transaction.getOutputs()[this.outputIndex].satoshis,
+      outputIndex: this.outputIndex,
+      script: this.transaction.getOutputs()[this.outputIndex].script,
+      ownerAddress: this.ownerAddress,
     };
   }
 
   isOwnedBy(address: string): boolean {
-    const { script } = this.transaction.getOutputs()[this.index];
+    const { script } = this.transaction.getOutputs()[this.outputIndex];
 
     const txTargetAdrHash = extractAddressFromPayToPublicKeyScript(script);
     const originAdrHash = adrToAdrHash(address);
@@ -70,6 +80,12 @@ class UTXO {
   equal(txOutput: UTXO) {
     return (
       txOutput.txId == this.txId && txOutput.ouputIndex == txOutput.ouputIndex
+    );
+  }
+
+  matchTxInput(input: TxInput) {
+    return (
+      this.txId == input.prevTxId && this.outputIndex == input.prevTxOutputIndex
     );
   }
 }
