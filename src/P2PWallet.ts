@@ -15,7 +15,6 @@ const checkCacheFolder = (path = "./idx/") => {
   if (!fs.existsSync(path)) {
     fs.mkdirSync(path);
   }
-
   return path;
 };
 

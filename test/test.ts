@@ -57,7 +57,7 @@ const test = async () => {
   });
 
   const tx1 = await myWallet.signTx({
-    to: alice.getAddress(2),
+    to: alice.getAddress(6),
     amount: 500,
   });
 
