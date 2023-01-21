@@ -9,10 +9,47 @@ import bsv from "bsv";
 import Address from "bsv/lib/address";
 import { UTXO } from "./Wallet";
 import { Wallet } from ".";
+import fs from "fs";
+
+const checkCacheFolder = (path = "./idx/") => {
+  if (!fs.existsSync(path)) {
+    fs.mkdirSync(path);
+  }
+
+  return path;
+};
+
+const write = (filePath: string, index: number) => {
+  const folderPath = checkCacheFolder();
+  const path = folderPath + filePath;
+  fs.writeFileSync(path, JSON.stringify(index));
+};
+
+const read = (filePath: string): number => {
+  const folderPath = checkCacheFolder();
+  const path = folderPath + filePath;
+  if (!fs.existsSync(path)) {
+    write(filePath, 0);
+    return 0;
+  }
+
+  var fileBuffer = fs.readFileSync(path);
+
+  return JSON.parse(fileBuffer.toString()) as number;
+};
 
 class P2PWallet extends HDPrivateKeyManager {
   public cache: BlockchainCache;
-  public lastUsedIndex: number = 0;
+
+  get lastUsedIndex(): number {
+    read(this.getAddress());
+    return 0;
+  }
+
+  set lastUsedIndex(v: number) {
+    write(this.getAddress(), v);
+  }
+
   constructor(params?: WalletConstructorParams) {
     const {
       key = "",
@@ -23,6 +60,7 @@ class P2PWallet extends HDPrivateKeyManager {
     } = params || {};
     super({ key, keyFormat, language, network, ...options });
     this.cache = new BlockchainCache(this);
+    this.lastUsedIndex = 5;
   }
 
   async downloadUTXO() {

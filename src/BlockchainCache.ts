@@ -78,6 +78,7 @@ class BlockchainCache {
     this.unspendOuputs = [];
     this.spendOuputs = [];
     for (let tx of rawTxs) {
+      const caches = this.wallet.getAddresses(0, this.wallet.lastUsedIndex);
       this.broadcast(tx);
     }
   }
@@ -118,6 +119,15 @@ class BlockchainCache {
 
   // * return the tx id
   broadcast = (txHex: string, start?: number, end?: number): string => {
+    if (start !== undefined && end) {
+      const addresses = this.wallet.getAddresses(start, end);
+      const caches = addresses.forEach((adr, i) => {
+        const cache = new BlockchainCache(this.wallet, start + i);
+        cache.broadcast(txHex);
+      });
+
+      return getTxId(txHex);
+    }
     const tx = new ReadOnlyTx(txHex);
 
     let unspendOutputs = this.unspendOuputs;
@@ -141,14 +151,6 @@ class BlockchainCache {
 
     this.unspendOuputs = unspendOutputs;
     this.spendOuputs = spendOutputs;
-
-    if (start !== undefined && end) {
-      const addresses = this.wallet.getAddresses(start, end);
-      const caches = addresses.forEach((adr, i) => {
-        const cache = new BlockchainCache(this.wallet, start + i);
-        cache.broadcast(txHex);
-      });
-    }
 
     return getTxId(txHex);
   };

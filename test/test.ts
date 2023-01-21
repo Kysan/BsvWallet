@@ -46,7 +46,7 @@ const test = async () => {
     // await bob.downloadUTXO();
   };
 
-  await syncWithBlockchain();
+  // await syncWithBlockchain();
   // console.log({
   //   myUtxo: myWallet.cache.unspendOuputs,
   //   aliceUtxo: alice.cache.unspendOuputs,
@@ -56,12 +56,12 @@ const test = async () => {
     aliceAdrs: [alice.getNewAddress(), alice.getNewAddress()],
   });
 
-  // const tx1 = await myWallet.signTx({
-  //   to: alice.getNewAddress(),
-  //   amount: 500,
-  // });
+  const tx1 = await myWallet.signTx({
+    to: alice.getAddress(2),
+    amount: 500,
+  });
 
-  // await alice.receive(tx1);
+  await alice.receive(tx1);
 
   await showAllBalance();
 
