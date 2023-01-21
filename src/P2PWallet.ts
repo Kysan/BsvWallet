@@ -9,7 +9,7 @@ import bsv from "bsv";
 import Address from "bsv/lib/address";
 import { UTXO } from "./Wallet";
 import { Wallet } from ".";
-import fs from "fs";
+import fs from "./Utils/CrossPlateformFS";
 
 const checkCacheFolder = (path = "./idx/") => {
   if (!fs.existsSync(path)) {
@@ -102,7 +102,7 @@ class P2PWallet extends HDPrivateKeyManager {
   public getUtxo(): UTXO[] {
     const address = this.getAddress();
 
-    const utxo = this.cache.getBulkUtxo(0, 10);
+    const utxo = this.cache.getBulkUtxo(0, 100);
 
     const allUTXO = utxo.map((utxo) => {
       const ownerAddress = this.getDerivatedAddress(0);
@@ -169,8 +169,17 @@ class P2PWallet extends HDPrivateKeyManager {
     return txHex;
   }
 
+  public broadcastToWhatsOnChain(txHex) {
+    const wallet = new Wallet({
+      key: this.getPrivateKey(),
+      network: this.getNetwork(),
+    });
+
+    wallet.broadcast(txHex);
+  }
+
   public receive(txHex: string): string {
-    return this.cache.broadcast(txHex, 0, 10);
+    return this.cache.broadcast(txHex, 0, 100);
   }
 }
 

@@ -2,10 +2,10 @@ import HDPrivateKeyManager, { WalletConstructorParams } from "./HDPrivateKey";
 import Blockchain from "./Blockchain";
 import StasTokenSchema from "./Utils/Types/StasTokenSchema";
 export declare type OutputRequest = {
-    type: "normal" | "op return";
+    type?: "normal" | "op return";
     to: string;
     amount: number;
-    opReturnData: string;
+    opReturnData?: string;
 };
 export declare type UTXO = {
     privKeyIndex: number;

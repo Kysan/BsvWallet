@@ -16,6 +16,7 @@ declare class HDPrivateKeyManager {
     private network;
     private mnemonic;
     constructor({ key, keyFormat, language, network }: WalletConstructorParams);
+    protected getNetwork(): BsvNetwork;
     /**
      * ------ Wrapper BSV.JS ----
      */

@@ -20,7 +20,7 @@ declare class HDWallet extends HDPrivateKeyManager {
     constructor(params?: WalletConstructorParams);
     getAddress(): Promise<string>;
     /**
-     * @param maxIndex this function with download the history of each derivated address from 0 to this
+     * @param maxIndex
      * @returns
      */
     getUtxo(): Promise<UTXO[]>;

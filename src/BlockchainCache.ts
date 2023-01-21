@@ -7,8 +7,7 @@ import { UnspendTransactionWoC } from "./Utils/HTTPResponse/UnspendTransaction";
 import ReadOnlyTx from "./ReadOnlyTx";
 
 import { AccountTxHistory } from "./Utils/TxHistory";
-
-import fs from "fs";
+import fs from "./Utils/CrossPlateformFS";
 import P2PWallet from "./P2PWallet";
 import UTXO from "./UTXO";
 

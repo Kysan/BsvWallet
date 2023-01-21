@@ -17,7 +17,6 @@ declare class Blockchain {
      * @returns
      */
     getBalancesFromAddresses(address: string[]): Promise<any[]>;
-    getAddressInfo(address: string): Promise<any>;
     getBulkUTXO(addresses: string[]): Promise<{
         height: number;
         tx_pos: number;
