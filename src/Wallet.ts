@@ -43,7 +43,7 @@ class HDWallet extends HDPrivateKeyManager {
   }
 
   /**
-   * @param maxIndex this function with download the history of each derivated address from 0 to this
+   * @param maxIndex
    * @returns
    */
   public async getUtxo(): Promise<UTXO[]> {

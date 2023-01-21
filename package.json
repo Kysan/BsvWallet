@@ -34,7 +34,7 @@
     "dev:notworking": "npx parcel watch src/index.ts",
     "dev": "tsc --watch",
     "test:notworking": "concurrently \"parcel watch test/index.ts --dist-dir test/dist\" \"nodemon test/dist/index.js\"",
-    "test": "node test/test.js",
+    "test": "ts-node test/test.ts",
     "build:node": "tsc",
     "build:browser": "npx parcel lib/node/index.js --dist-dir lib/browser",
     "build": "npm run build:node && npm run build:browser",
@@ -62,6 +62,7 @@
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
+    "ts-node": "^10.9.1",
     "typescript": "^4.7.4",
     "util": "^0.12.4"
   },

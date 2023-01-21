@@ -1,4 +1,5 @@
 import * as bsv from "bsv";
+import { Encoders } from "..";
 
 const getTxId = (tx_hex) => {
   const tx_buffer = Buffer.from(tx_hex, "hex");
@@ -12,7 +13,16 @@ const sha256ripemd160 = (buffer: Buffer): Buffer => {
   return bsv.crypto.sha256ripemd160(buffer);
 };
 
-const adrToAdrHash = (adr) => {
+// const adrToHashV2 = (adr: string) => {
+//  sha256ripemd160(
+//     Encoders.Base58StrToBuffer(adrAntho).toString("hex")
+//   // ),
+// };
+
+/**
+ * ancienne version avec nom incorrecte
+ */
+const adrToAdrHashV1 = (adr) => {
   // * note:
   // adr: sha256ripemd160(
   //   Encoders.Base58StrToBuffer(adrAntho).toString("hex")
@@ -28,4 +38,4 @@ const adrToAdrHash = (adr) => {
   return hashedAdr;
 };
 
-export { getTxId, sha256ripemd160, adrToAdrHash };
+export { getTxId, sha256ripemd160, adrToAdrHashV1 as adrToAdrHash };

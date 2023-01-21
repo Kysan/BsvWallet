@@ -88,12 +88,6 @@ class Blockchain {
     return res;
   }
 
-  async getAddressInfo(address: string): Promise<any> {
-    const { data } = await this.api.get(`/address/${address}/info`);
-
-    return data;
-  }
-
   async getBulkUTXO(addresses: string[]): Promise<
     {
       height: number;

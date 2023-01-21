@@ -7,10 +7,10 @@ import { adrToAdrHash, getTxId } from "./Utils/Crypto";
 import StasTokenSchema from "./Utils/Types/StasTokenSchema";
 
 export type OutputRequest = {
-  type: "normal" | "op return";
+  type?: "normal" | "op return";
   to: string; // address
   amount: number;
-  opReturnData: string;
+  opReturnData?: string;
 };
 
 export type UTXO = {

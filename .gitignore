@@ -1,3 +1,6 @@
 node_modules/
 .parcel-cache/
 lib/
+.old_code
+.txs/
+.prebug/

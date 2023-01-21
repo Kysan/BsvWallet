@@ -63,6 +63,10 @@ class HDPrivateKeyManager {
     this.network = network;
   }
 
+  protected getNetwork() {
+    return this.network;
+  }
+
   /**
    * ------ Wrapper BSV.JS ----
    */
@@ -122,7 +126,6 @@ class HDPrivateKeyManager {
       start = end;
       end = tmp;
     }
-    // console.log({ start, end });
 
     const addresses = [];
     for (let n = start; n <= end; ++n) {

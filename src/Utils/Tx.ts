@@ -1,20 +1,5 @@
 import { adrToAdrHash, getTxId } from "./Crypto";
-
 import bsv from "bsv";
-
-class Tx {
-  // * à faire plus tard
-  private inputs: any[];
-  private outputs: any[];
-
-  addInput(input: any) {}
-
-  addOutput(output: any) {}
-
-  sign(keyOrKeys: string | string[]): string {
-    return "";
-  }
-}
 
 export type WoCUtxo = {
   satoshis: number;
@@ -34,7 +19,6 @@ const getTxUnspendOutput = (
   tx_hex: string,
   givenAdr: string
 ): Array<WoCUtxo> => {
-  // TODO: checker si il y a pas une transaction dans le cache qui fait référence à celle si
   const tx = new bsv.Transaction(tx_hex);
   const outputsData = tx.toObject().outputs;
 
@@ -54,6 +38,13 @@ const getTxUnspendOutput = (
     // * je prend juste pas targetAdrHash & j'ajoute l'identifiant de la tx
     return { satoshis, script, txid: getTxId(tx_hex), vout: i };
   });
+};
+
+export const extractAddressFromPayToPublicKeyScript = (
+  script: string
+): string => {
+  const publicKey = script.split(" ")[2];
+  return publicKey;
 };
 
 /**
